@@ -10,6 +10,9 @@ interface VitalFormProps {
     sex: PatientSex;
     height: number | "";
     weight: number | "";
+    muac?: number | "";
+    length?: number | "";
+    waist?: number | "";
     conditionProfile: SimulationProfile;
   }) => void;
   onReset: () => void;
@@ -22,7 +25,17 @@ export default function VitalForm({ onGenerate, onReset }: VitalFormProps) {
   const [sex, setSex] = useState<PatientSex>("Male");
   const [height, setHeight] = useState<number | "">("");
   const [weight, setWeight] = useState<number | "">("");
+  const [muac, setMuac] = useState<number | "">("");
+  const [length, setLength] = useState<number | "">("");
+  const [waist, setWaist] = useState<number | "">("");
   const [conditionProfile, setConditionProfile] = useState<SimulationProfile>("healthy");
+  const [generateOptions, setGenerateOptions] = useState({
+    includeLength: true,
+    includeWaist: true,
+    includeMuac: true,
+  });
+
+  const isPediatric = age !== "" && Number(age) >= 0 && Number(age) <= 3;
 
   // Handle Form Submission
   const handleSubmit = (e: React.FormEvent) => {
@@ -41,6 +54,9 @@ export default function VitalForm({ onGenerate, onReset }: VitalFormProps) {
       sex,
       height,
       weight,
+      muac: isPediatric && generateOptions.includeMuac ? muac : undefined,
+      length: isPediatric && generateOptions.includeLength ? length : undefined,
+      waist: isPediatric && generateOptions.includeWaist ? waist : undefined,
       conditionProfile
     });
   };
@@ -72,7 +88,13 @@ export default function VitalForm({ onGenerate, onReset }: VitalFormProps) {
     setSex(randSex);
     setHeight(""); // Let generator compute realistic values
     setWeight(""); // Let generator compute realistic values
+    setMuac("");
+    setLength("");
+    setWaist("");
     setConditionProfile(randProfile);
+
+    // Is randomized pediatric?
+    const isRandPediatric = randAge <= 3;
 
     // Generate immediately
     onGenerate({
@@ -81,6 +103,9 @@ export default function VitalForm({ onGenerate, onReset }: VitalFormProps) {
       sex: randSex,
       height: "",
       weight: "",
+      muac: isRandPediatric && generateOptions.includeMuac ? "" : undefined,
+      length: isRandPediatric && generateOptions.includeLength ? "" : undefined,
+      waist: isRandPediatric && generateOptions.includeWaist ? "" : undefined,
       conditionProfile: randProfile
     });
   };
@@ -92,7 +117,15 @@ export default function VitalForm({ onGenerate, onReset }: VitalFormProps) {
     setSex("Male");
     setHeight("");
     setWeight("");
+    setMuac("");
+    setLength("");
+    setWaist("");
     setConditionProfile("healthy");
+    setGenerateOptions({
+      includeLength: true,
+      includeWaist: true,
+      includeMuac: true,
+    });
     onReset();
   };
 
@@ -213,7 +246,115 @@ export default function VitalForm({ onGenerate, onReset }: VitalFormProps) {
             />
           </div>
         </div>
-        <p className="text-[10px] text-slate-400 -mt-2">Leave height/weight blank to generate realistic weight/height relative to age, calibrated for Asian standards.</p>
+        <p className="text-[10px] text-slate-400 -mt-2">
+          Leave height/weight blank to generate realistic weight/height relative to age, calibrated for Asian standards.
+        </p>
+
+        {/* Dynamic Pediatric Option Box */}
+        {isPediatric && (
+          <div className="p-3.5 rounded-xl border border-sky-100 dark:border-sky-900 bg-sky-50/20 dark:bg-sky-950/20 space-y-3 transition-all duration-200 animate-in fade-in" id="pediatric-options-panel">
+            <div className="text-[11px] font-bold text-sky-700 dark:text-sky-400 flex items-center space-x-1.5 uppercase tracking-wide">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Pediatric Anthropmetric Measures (0-3 Years)</span>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-2">
+              <label className="flex items-center space-x-1.5 text-[10px] sm:text-[11px] font-medium text-slate-650 dark:text-slate-350 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={generateOptions.includeLength}
+                  onChange={(e) => setGenerateOptions(prev => ({ ...prev, includeLength: e.target.checked }))}
+                  className="rounded border-slate-300 dark:border-slate-800 text-sky-650 focus:ring-sky-550 size-3.5"
+                />
+                <span>Generate Length</span>
+              </label>
+
+              <label className="flex items-center space-x-1.5 text-[10px] sm:text-[11px] font-medium text-slate-650 dark:text-slate-350 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={generateOptions.includeWaist}
+                  onChange={(e) => setGenerateOptions(prev => ({ ...prev, includeWaist: e.target.checked }))}
+                  className="rounded border-slate-300 dark:border-slate-800 text-sky-650 focus:ring-sky-550 size-3.5"
+                />
+                <span>Generate Waist</span>
+              </label>
+
+              <label className="flex items-center space-x-1.5 text-[10px] sm:text-[11px] font-medium text-slate-650 dark:text-slate-350 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={generateOptions.includeMuac}
+                  onChange={(e) => setGenerateOptions(prev => ({ ...prev, includeMuac: e.target.checked }))}
+                  className="rounded border-slate-300 dark:border-slate-800 text-sky-650 focus:ring-sky-550 size-3.5"
+                />
+                <span>Generate MUAC</span>
+              </label>
+            </div>
+
+            {/* Grid of Pediatric input fields */}
+            <div className="grid grid-cols-3 gap-2 pt-1 border-t border-sky-100/40 dark:border-sky-900/30">
+              {generateOptions.includeLength && (
+                <div className="space-y-1">
+                  <label htmlFor="length" className="block text-[10px] font-medium text-slate-600 dark:text-slate-400">
+                    Length <span className="text-slate-400">(cm)</span>
+                  </label>
+                  <input
+                    type="number"
+                    id="length"
+                    min="30"
+                    max="110"
+                    step="0.1"
+                    placeholder="Auto-gen"
+                    value={length}
+                    onChange={(e) => setLength(e.target.value === "" ? "" : Number(e.target.value))}
+                    className="placeholder-slate-400 w-full px-2 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-[11px] text-slate-800 dark:text-slate-200 focus:outline-hidden focus:ring-1 focus:ring-sky-500"
+                  />
+                </div>
+              )}
+
+              {generateOptions.includeWaist && (
+                <div className="space-y-1">
+                  <label htmlFor="waist" className="block text-[10px] font-medium text-slate-600 dark:text-slate-400">
+                    Waist <span className="text-slate-400">(cm)</span>
+                  </label>
+                  <input
+                    type="number"
+                    id="waist"
+                    min="25"
+                    max="65"
+                    step="0.1"
+                    placeholder="Auto-gen"
+                    value={waist}
+                    onChange={(e) => setWaist(e.target.value === "" ? "" : Number(e.target.value))}
+                    className="placeholder-slate-400 w-full px-2 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-[11px] text-slate-800 dark:text-slate-200 focus:outline-hidden focus:ring-1 focus:ring-sky-500"
+                  />
+                </div>
+              )}
+
+              {generateOptions.includeMuac && (
+                <div className="space-y-1">
+                  <label htmlFor="muac" className="block text-[10px] font-medium text-slate-600 dark:text-slate-400">
+                    MUAC <span className="text-slate-400">(cm)</span>
+                  </label>
+                  <input
+                    type="number"
+                    id="muac"
+                    min="5"
+                    max="30"
+                    step="0.1"
+                    placeholder="Auto-gen"
+                    value={muac}
+                    onChange={(e) => setMuac(e.target.value === "" ? "" : Number(e.target.value))}
+                    className="placeholder-slate-450 w-full px-2 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-[11px] text-slate-800 dark:text-slate-200 focus:outline-hidden focus:ring-1 focus:ring-sky-500"
+                  />
+                </div>
+              )}
+            </div>
+
+            <p className="text-[9px] text-slate-450 leading-relaxed">
+              Standard WHO reference points for Asian infants/toddlers. Length is recumbent crown-heel, Waist is abdominal circumference.
+            </p>
+          </div>
+        )}
 
         {/* Advanced Feature: Condition Simulation Profile */}
         <div className="space-y-1.5 p-3 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80">

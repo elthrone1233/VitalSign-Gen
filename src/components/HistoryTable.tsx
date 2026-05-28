@@ -76,7 +76,10 @@ export default function HistoryTable({
       "Age",
       "Assigned Sex",
       "Height (cm)",
+      "Length (cm)",
       "Weight (kg)",
+      "Waist (cm)",
+      "MUAC (cm)",
       "Blood Pressure (mmHg)",
       "Heart Rate (bpm)",
       "Respiratory Rate (breaths/min)",
@@ -93,7 +96,10 @@ export default function HistoryTable({
       r.age,
       r.sex,
       r.height,
+      r.length !== undefined ? r.length : "",
       r.weight,
+      r.waist !== undefined ? r.waist : "",
+      r.muac !== undefined ? r.muac : "",
       r.bpValue,
       r.hr,
       r.rr,
@@ -295,8 +301,33 @@ export default function HistoryTable({
                     {/* Age and assigned sex */}
                     <td className="py-3 px-3">
                       <div className="space-y-0.5 text-slate-600 dark:text-slate-400">
-                        <span>{record.age} yrs</span>
-                        <span className="text-[10.5px] border border-slate-200 dark:border-slate-800 text-slate-450 dark:text-slate-550 px-1 py-0.2 rounded-sm ml-1.5">{record.sex}</span>
+                        <div className="flex items-center">
+                          <span className="font-semibold">{record.age} yrs</span>
+                          <span className="text-[10px] border border-slate-200 dark:border-slate-800 text-slate-450 dark:text-slate-500 px-1 py-0.2 rounded-sm ml-1.5 font-mono">{record.sex}</span>
+                        </div>
+                        <div className="text-[10px] text-slate-450 dark:text-slate-500 font-mono flex flex-wrap gap-x-1.5 items-center">
+                          <span>H: {record.height}cm</span>
+                          {record.length !== undefined && (
+                            <>
+                              <span>•</span>
+                              <span className="text-sky-600 dark:text-sky-400">L: {record.length}cm</span>
+                            </>
+                          )}
+                          <span>•</span>
+                          <span>W: {record.weight}kg</span>
+                          {record.waist !== undefined && (
+                            <>
+                              <span>•</span>
+                              <span className="text-sky-600 dark:text-sky-400">Waist: {record.waist}cm</span>
+                            </>
+                          )}
+                          {record.muac !== undefined && (
+                            <>
+                              <span>•</span>
+                              <span className="text-sky-600 dark:text-sky-400 font-semibold">MUAC: {record.muac}cm</span>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </td>
 

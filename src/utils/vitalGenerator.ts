@@ -75,6 +75,40 @@ export function generateWeight(age: number, sex: PatientSex): number {
   }
 }
 
+// Generate Mid-Upper Arm Circumference (MUAC) for age 0 to 3 in cm
+export function generateMUAC(age: number): number {
+  if (age <= 0.5) {
+    // 0 to 6 months: typically 9.5 to 13 cm
+    return randomDecimalInRange(9.5, 13.0, 1);
+  } else if (age <= 1) {
+    // 6 to 12 months: typically 11.0 to 14.5 cm
+    return randomDecimalInRange(11.0, 14.5, 1);
+  } else if (age <= 2) {
+    // 1 to 2 yrs: 12 to 15.5 cm
+    return randomDecimalInRange(12.0, 15.5, 1);
+  } else {
+    // 2 to 3 yrs: 12.5 to 16.5 cm
+    return randomDecimalInRange(12.5, 16.5, 1);
+  }
+}
+
+// Generate Waist Circumference (Waist) for age 0 to 3 in cm
+export function generateWaist(age: number): number {
+  if (age <= 0.5) {
+    // 0 to 6 months: typically 32.0 to 44.0 cm
+    return randomDecimalInRange(32.0, 44.0, 1);
+  } else if (age <= 1) {
+    // 6 to 12 months: typically 36.0 to 47.0 cm
+    return randomDecimalInRange(36.0, 47.0, 1);
+  } else if (age <= 2) {
+    // 1 to 2 yrs: 38.0 to 50.0 cm
+    return randomDecimalInRange(38.0, 50.0, 1);
+  } else {
+    // 2 to 3 yrs: 40.0 to 52.0 cm
+    return randomDecimalInRange(40.0, 52.0, 1);
+  }
+}
+
 // Calculate BMI
 export function calculateBMI(weightKg: number, heightCm: number): { bmi: number; category: BMICategory } {
   const heightM = heightCm / 100;
@@ -149,6 +183,9 @@ export function generateVitalRecord(params: {
   sex: PatientSex;
   height?: number;
   weight?: number;
+  muac?: number;
+  length?: number;
+  waist?: number;
   conditionProfile: SimulationProfile;
 }): VitalRecord {
   const { fullName, age, sex, conditionProfile } = params;
@@ -156,6 +193,16 @@ export function generateVitalRecord(params: {
   // 1. Establish height/weight (generate if empty)
   const finalHeight = params.height && params.height > 0 ? params.height : generateHeight(age, sex);
   const finalWeight = params.weight && params.weight > 0 ? params.weight : generateWeight(age, sex);
+  
+  // 1b. MUAC, Length, and Waist (if child 0-3 years old)
+  let finalMuac: number | undefined = undefined;
+  let finalLength: number | undefined = undefined;
+  let finalWaist: number | undefined = undefined;
+  if (age <= 3) {
+    finalMuac = params.muac && params.muac > 0 ? params.muac : generateMUAC(age);
+    finalLength = params.length && params.length > 0 ? params.length : parseFloat((finalHeight + randomDecimalInRange(1.0, 2.5, 1)).toFixed(1));
+    finalWaist = params.waist && params.waist > 0 ? params.waist : generateWaist(age);
+  }
   
   // 2. BMI
   const { bmi, category: bmiCategory } = calculateBMI(finalWeight, finalHeight);
@@ -264,7 +311,10 @@ export function generateVitalRecord(params: {
     rr,
     temp,
     conditionProfile,
-    generatedAt: new Date().toISOString()
+    generatedAt: new Date().toISOString(),
+    muac: finalMuac,
+    length: finalLength,
+    waist: finalWaist
   };
 }
 

@@ -22,7 +22,7 @@ export interface VitalRecord {
   fullName: string;
   age: number;
   sex: PatientSex;
-  height: number; // in cm
+  height: number; // in cm (represents recumbent length for ages 0-3)
   weight: number; // in kg
   bmi: number;
   bmiCategory: BMICategory;
@@ -34,6 +34,9 @@ export interface VitalRecord {
   temp: number; // °C
   conditionProfile: SimulationProfile;
   generatedAt: string; // ISO String
+  muac?: number; // Mid-Upper Arm Circumference (only for ages 0-3 in cm)
+  length?: number; // Recumbent Length (only for ages 0-3 in cm)
+  waist?: number; // Waist Circumference (only for ages 0-3 in cm)
 }
 
 export type BMICategory = "Underweight" | "Normal" | "Overweight" | "Obese";

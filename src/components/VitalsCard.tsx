@@ -52,6 +52,13 @@ export default function VitalsCard({ record }: VitalsCardProps) {
       return;
     }
 
+    const isPediatric = record.age <= 3;
+    const heightLabel = isPediatric 
+      ? `Height is ${record.height} centimeters. Recumbent length is ${record.length ?? record.height} centimeters.` 
+      : `Height is ${record.height} centimeters.`;
+    const muacSpeech = record.muac !== undefined ? `Mid-upper arm circumference is ${record.muac} centimeters. ` : "";
+    const waistSpeech = record.waist !== undefined ? `Abdominal waist circumference is ${record.waist} centimeters. ` : "";
+
     const bpText = record.bpValue === "N/A" 
       ? "Blood pressure is Not Applicable for toddler age." 
       : `Blood pressure is ${record.systolic} over ${record.diastolic} millimeters of mercury.`;
@@ -60,7 +67,7 @@ export default function VitalsCard({ record }: VitalsCardProps) {
       Patient report for ${record.fullName}.
       Age is ${record.age} years old.
       Sex assigned is ${record.sex}.
-      Height is ${record.height} centimeters and weight is ${record.weight} kilograms.
+      ${heightLabel} Weight is ${record.weight} kilograms. ${muacSpeech}${waistSpeech}
       Computed BMI is ${record.bmi}, which is classified as ${record.bmiCategory}.
       Vitals measurements:
       ${bpText}
@@ -151,26 +158,73 @@ export default function VitalsCard({ record }: VitalsCardProps) {
     doc.text(getProfileLabel(record.conditionProfile), 55, 68);
 
     // Right side items
-    doc.setFont("helvetica", "bold");
-    doc.text("Height:", 120, 50);
-    doc.setFont("helvetica", "normal");
-    doc.text(`${record.height} cm`, 140, 50);
+    const isPediatric = record.age <= 3;
 
-    doc.setFont("helvetica", "bold");
-    doc.text("Weight:", 120, 56);
-    doc.setFont("helvetica", "normal");
-    doc.text(`${record.weight} kg`, 140, 56);
+    if (isPediatric) {
+      doc.setFont("helvetica", "bold");
+      doc.text("Height:", 120, 50);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${record.height} cm`, 148, 50);
 
-    doc.setFont("helvetica", "bold");
-    doc.text("Computed BMI:", 120, 62);
-    doc.setFont("helvetica", "normal");
-    doc.text(`${record.bmi} (${record.bmiCategory})`, 150, 62);
+      doc.setFont("helvetica", "bold");
+      doc.text("Length:", 120, 56);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${record.length ?? record.height} cm`, 148, 56);
 
-    doc.setFont("helvetica", "bold");
-    doc.text("Record ID:", 120, 68);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8.5);
-    doc.text(record.id, 140, 68);
+      doc.setFont("helvetica", "bold");
+      doc.text("Weight:", 120, 62);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${record.weight} kg`, 148, 62);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Computed BMI:", 120, 68);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${record.bmi} (${record.bmiCategory})`, 152, 68);
+
+      let currentY = 74;
+      if (record.muac !== undefined) {
+        doc.setFont("helvetica", "bold");
+        doc.text("MUAC:", 120, currentY);
+        doc.setFont("helvetica", "normal");
+        doc.text(`${record.muac} cm`, 148, currentY);
+        currentY += 6;
+      }
+
+      if (record.waist !== undefined) {
+        doc.setFont("helvetica", "bold");
+        doc.text("Waist Circ:", 120, currentY);
+        doc.setFont("helvetica", "normal");
+        doc.text(`${record.waist} cm`, 148, currentY);
+        currentY += 6;
+      }
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Record ID:", 120, currentY);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.text(record.id, 140, currentY);
+    } else {
+      doc.setFont("helvetica", "bold");
+      doc.text("Height:", 120, 50);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${record.height} cm`, 148, 50);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Weight:", 120, 56);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${record.weight} kg`, 148, 56);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Computed BMI:", 120, 62);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${record.bmi} (${record.bmiCategory})`, 152, 62);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Record ID:", 120, 68);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      doc.text(record.id, 140, 68);
+    }
 
     // 4. Vital Signs Table Section
     doc.setFont("helvetica", "bold");
@@ -334,15 +388,33 @@ export default function VitalsCard({ record }: VitalsCardProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 pt-3 border-t border-slate-150 dark:border-slate-800" id="body-metrics-row">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 pt-3 border-t border-slate-150 dark:border-slate-800" id="body-metrics-row">
             <div>
               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-tight flex items-center gap-1">Height</span>
               <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{record.height} <span className="text-[10px] font-normal text-slate-400">cm</span></span>
             </div>
+            {record.length !== undefined && (
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-tight flex items-center gap-1 text-sky-600 dark:text-sky-400">Length</span>
+                <span className="text-sm font-bold text-sky-600 dark:text-sky-400">{record.length} <span className="text-[10px] font-normal text-sky-500/80">cm</span></span>
+              </div>
+            )}
             <div>
               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-tight flex items-center gap-1">Weight</span>
               <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{record.weight} <span className="text-[10px] font-normal text-slate-400">kg</span></span>
             </div>
+            {record.waist !== undefined && (
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-450 tracking-tight flex items-center gap-1 text-sky-600 dark:text-sky-400">Waist Circ</span>
+                <span className="text-sm font-bold text-sky-600 dark:text-sky-400">{record.waist} <span className="text-[10px] font-normal text-sky-500/80">cm</span></span>
+              </div>
+            )}
+            {record.muac !== undefined && (
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-450 tracking-tight flex items-center gap-1 text-sky-600 dark:text-sky-400">MUAC</span>
+                <span className="text-sm font-bold text-sky-600 dark:text-sky-400">{record.muac} <span className="text-[10px] font-normal text-sky-500/80">cm</span></span>
+              </div>
+            )}
             <div>
               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-tight">BMI / Category</span>
               <div className="flex items-center space-x-1">

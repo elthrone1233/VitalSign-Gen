@@ -53,6 +53,9 @@ export default function App() {
     sex: PatientSex;
     height: number | "";
     weight: number | "";
+    muac?: number | "";
+    length?: number | "";
+    waist?: number | "";
     conditionProfile: SimulationProfile;
   }) => {
     // Invoke scientific generator with payload parameters
@@ -62,6 +65,9 @@ export default function App() {
       sex: formPayload.sex,
       height: formPayload.height === "" ? undefined : formPayload.height,
       weight: formPayload.weight === "" ? undefined : formPayload.weight,
+      muac: formPayload.muac === "" || formPayload.muac === undefined ? undefined : formPayload.muac,
+      length: formPayload.length === "" || formPayload.length === undefined ? undefined : formPayload.length,
+      waist: formPayload.waist === "" || formPayload.waist === undefined ? undefined : formPayload.waist,
       conditionProfile: formPayload.conditionProfile,
     });
 
