@@ -114,10 +114,10 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-xl font-bold font-display tracking-tight text-slate-900 dark:text-slate-50 flex items-center gap-1.5">
-                Random Vital Signs Generator
+                SFC VITALS
               </h1>
               <p className="text-[11px] text-slate-450 dark:text-slate-400 font-mono leading-none">
-                Interactive Medical Simulation Tool • V1.4
+                Interactive Medical Simulation Tool • SFC Demographics V1.4
               </p>
             </div>
           </div>
