@@ -1,0 +1,6 @@
+{
+  "name": "Random Vital Signs Generator",
+  "description": "An interactive medical utility to simulate, generate, and track realistic vital signs based on patient age and profile with historical records, beautiful data visualization, TTS voice readouts, and PDF exports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

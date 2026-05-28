@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Base style resets */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 transition-colors duration-200 antialiased;
+}
+
+/* Specialized CSS Print overrides styled precisely for standard clinical chart printing */
+@media print {
+  body {
+    background-color: white !important;
+    color: black !important;
+    font-size: 12pt !important;
+  }
+  
+  /* Hide headers, inputs, logs, analytics during print */
+  header, 
+  #patient-vital-form-wrapper, 
+  #history-section, 
+  #dashboard-analytics-section,
+  #report-utility-panel,
+  #report-ribbon,
+  #empty-report-screen,
+  #github-link,
+  #theme-toggle-btn {
+    display: none !important;
+  }
+
+  /* Make reporting full page width */
+  #vitals-report-card {
+    border: none !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #main-grid {
+    display: block !important;
+  }
+}
